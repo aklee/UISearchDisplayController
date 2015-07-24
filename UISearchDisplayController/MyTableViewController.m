@@ -4,7 +4,7 @@
 //
 //  Created by Phillip Harris on 4/19/14.
 //  Copyright (c) 2014 Phillip Harris. All rights reserved.
-//
+//  添加自定义视图
 
 #import "MyTableViewController.h"
 
@@ -13,7 +13,8 @@
 @property (nonatomic, strong) NSArray *names;
 @property (nonatomic, strong) NSArray *searchResults;
 @property (nonatomic, strong) UISearchDisplayController *searchController;
-
+@property(nonatomic,weak)UIView*mask;
+@property(nonatomic,weak)   UISearchBar *searchBar ;
 @end
 
 @implementation MyTableViewController
@@ -56,7 +57,11 @@
     [super viewDidLoad];
     
     [self configureTableView:self.tableView];
-    
+    UIView*mask= [[UIView alloc]initWithFrame:self.view.bounds];
+    mask.backgroundColor=[UIColor grayColor];
+    [self.view addSubview:mask];
+    self.mask=mask;
+    mask.hidden=YES;
     // If you don't add the search bar and search display controller in Interface Builder, you can instead add them programmatically here.
 //    [self addSearchBarAndSearchDisplayController];
 }
@@ -71,9 +76,8 @@
     UISearchBar *searchBar = [[UISearchBar alloc] initWithFrame:CGRectZero];
     [searchBar sizeToFit];
     searchBar.delegate = self;
-    
     self.tableView.tableHeaderView = searchBar;
-    
+    self.searchBar=searchBar;
     UISearchDisplayController *searchDisplayController = [[UISearchDisplayController alloc] initWithSearchBar:searchBar contentsController:self];
     searchDisplayController.delegate = self;
     searchDisplayController.searchResultsDataSource = self;
@@ -144,12 +148,18 @@
 }
 - (void)searchDisplayControllerDidBeginSearch:(UISearchDisplayController *)controller {
     NSLog(@"🔦 | did begin search");
+    
+    
+    [self.view insertSubview:self.mask belowSubview:self.searchBar];
+    self.mask.hidden=NO;
+    
 }
 - (void)searchDisplayControllerWillEndSearch:(UISearchDisplayController *)controller {
     NSLog(@"🔦 | will end search");
 }
 - (void)searchDisplayControllerDidEndSearch:(UISearchDisplayController *)controller {
     NSLog(@"🔦 | did end search");
+    self.mask.hidden=YES;
 }
 - (void)searchDisplayController:(UISearchDisplayController *)controller didLoadSearchResultsTableView:(UITableView *)tableView {
     NSLog(@"🔦 | did load table");
